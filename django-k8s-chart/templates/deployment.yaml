@@ -1,0 +1,75 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: django-app
+  labels:
+    app: django
+spec:
+  # {{- if not .Values.autoscaling.enabled }}
+  replicas: 2
+  # {{- end }}
+  selector:
+    matchLabels:
+      app: django
+      tier: app
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 0
+
+  template:
+    metadata:
+      labels:
+        app: django
+        tier: app
+    spec:
+      
+      containers:
+        - name: django-image
+          # securityContext:
+          #   {{- toYaml .Values.securityContext | nindent 12 }}
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag}}"
+          # imagePullPolicy: {{ .Values.image.pullPolicy }}
+          ports:
+            - name: djangoport
+              containerPort: 8000
+              protocol: TCP
+          livenessProbe:
+            httpGet:
+              path: /healthcheck
+              port: 8000
+          readinessProbe:
+            httpGet:
+              path: /healthcheck
+              port: 8000
+          resources:
+            requests:
+              cpu: 100m
+              memory: 512Mi
+            limits:
+              cpu: 200m
+              memory: 1Gi
+          env:
+          - name: ALLOWED_HOSTS
+            valueFrom:
+              configMapKeyRef:
+                name: django-configmap
+                key: ALLOWED_HOSTS
+          - name: DATABASE_URL
+            valueFrom:
+              configMapKeyRef:
+                name: django-configmap 
+                key: DATABASE_URL
+          imagePullSecrets:
+            - name : {{ .Values.imagePullSecrets.name }}
+
+          volumes:
+            - name: {{ .Values.volumes.name }}
+              persistentVolumeClaim: 
+                claimName: {{ .Values.volumes.claimName }}
+          serviceAccountName: {{ .Values.serviceAccount.name }}
+      
+          volumeMounts:
+            - name: {{ .Values.volumes.name }}
+              mountPath: {{ .Values.volumeMounts.mountPath }}

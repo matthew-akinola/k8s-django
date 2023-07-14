@@ -1,0 +1,128 @@
+# Default values for django-k8s-chart.
+# This is a YAML-formatted file.
+# Declare variables to be passed into your templates.
+
+volumes:
+  name: django-app-data
+  claimName: django-app-pvc
+
+volumeMounts:
+  name: django-app-data
+  mountPath: /vol/web
+
+replicaCount: 2
+
+image:
+  repository: techmatt/k8s
+  pullPolicy: IfNotPresent
+  # Overrides the image tag whose default is the chart appVersion.
+  tag: latest
+
+imagePullSecrets: 
+  name: container-secret
+nameOverride: django-app
+fullnameOverride: django-app
+
+
+serviceAccount:
+  # Specifies whether a service account should be created
+  create: true
+  # Annotations to add to the service account
+  annotations: {}
+  # The name of the service account to use.
+  # If not set and create is true, a name is generated using the fullname template
+  name: admin-user
+  namespace: default
+
+
+persistentVolume:
+  enabled: {}
+  annotations: {}
+  name: django-k8s-pv
+  namespace: default
+  spec:
+    capacity:
+      storage: 5Gi  
+    accessModes:
+      - ReadWriteOnce
+    persistentVolumeReclaimPolicy: Retain
+    storageClassName: k8s-scs
+    hostPath:
+        path: "/mnt/data"
+
+persistentVolumeClaim:
+  name: django-app-pvc
+  labels:
+    app: django
+  spec:
+    accessModes:
+      - ReadWriteOnce
+    storageClassName: k8s-scs
+    resources:
+      requests:
+        storage: 3Gi
+
+
+podAnnotations: {}
+
+podSecurityContext: {}
+  # fsGroup: 2000
+
+securityContext: {}
+  # capabilities:
+  #   drop:
+  #   - ALL
+  # readOnlyRootFilesystem: true
+  # runAsNonRoot: true
+  # runAsUser: 1000
+
+service:
+  name: django-service
+  targetPort: 8000
+  port: 80
+  type: NodePort
+
+selector:
+  app: django
+  tier: app
+
+ingress:
+  enabled: true
+  className: nginx
+  annotations: 
+    kubernetes.io/ingress.class: nginx
+    # kubernetes.io/tls-acme: "true"
+  hosts:
+    - host: tolulorpeh.fun
+      paths:
+        - path: /
+          pathType: ImplementationSpecific
+  tls: []
+  #  - secretName: chart-example-tls
+  #    hosts:
+  #      - chart-example.local
+
+resources: 
+  requests:
+    cpu: 100m
+    memory: 512Mi
+  limits:
+    cpu: 200m
+    memory: 1Gi
+
+autoscaling:
+  enabled: true
+  minReplicas: 1
+  maxReplicas: 5
+  targetCPUUtilizationPercentage: 60
+  targetMemoryUtilizationPercentage: 80
+
+nodeSelector: {}
+
+tolerations: []
+
+affinity: {}
+
+
+
+
