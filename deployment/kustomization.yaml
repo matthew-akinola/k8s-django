@@ -1,14 +1,12 @@
-# secretGenerator:
-#   - name: db-passwords
-#     literals:
-#       - password=d359a75ff33f7a662f9fed6e175fa5525ef700703ce5d04fc4c21668b62d1ff2
-#   - name: django
-#     literals:
-#       - secret=django-insecure-u-htf0s0#aasruqzx#043qq(b&#ol#6rkv)va8r^6t0g-rr!hd
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
 resources:
-  - django.yaml
+  - deployment.yaml
+  - autoscale.yaml
+  - config.yaml
+  - serviceAccount.yaml
   - storageclass.yaml
   - ingress.yaml
   - secret.yaml
   - pvc.yaml
-  - dashboard-sa.yaml

@@ -1,5 +1,5 @@
-resource "aws_ecr_repository" "app" {
-  name                 = "${var.prefix}-app"
+resource "aws_ecr_repository" "django_ecr" {
+  name                 = "django-k8s-container"
   image_tag_mutability = "MUTABLE"
   force_delete         = true
 
@@ -23,7 +23,7 @@ resource "aws_iam_policy" "allow_ecr_app" {
           "ecr:GetDownloadUrlForLayer",
           "ecr:GetAuthorizationToken"
         ],
-        Resource = aws_ecr_repository.app.arn
+        Resource = aws_ecr_repository.django_ecr.arn
       }
     ]
   })

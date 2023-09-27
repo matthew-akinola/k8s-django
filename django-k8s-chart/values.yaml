@@ -14,27 +14,58 @@ replicaCount: 2
 
 image:
   repository: techmatt/k8s
-  pullPolicy: IfNotPresent
-  # Overrides the image tag whose default is the chart appVersion.
+  pullPolicy: Always
   tag: latest
 
-imagePullSecrets: 
-  name: container-secret
+imagePullSecrets: []
 nameOverride: django-app
-fullnameOverride: django-app
+fullnameOverride: django-k8s-chart
+
+#--------DEPLOYMENT-----------------------------
+
+deployment:
+  metadata:
+  name: django-app
+  replicas: 2
+  app: django
+  tier: app
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 0
+  template:
+    app: django
+    tier: app
+  containers:
+    name: django-image
+    image: "{{ .Values.image.repository }}:{{ .Values.image.tag}}"
+    ports:
+      name: djangoport
+      containerPort: 8000
+      resources:
+        requests:
+          cpu: 100m
+          memory: 512Mi
+        limits:
+          cpu: 200m
+          memory: 1Gi
+  env:
+    - name: ALLOWED_HOSTS
+      valueFrom:
+        configMapKeyRef:
+          name: django-configmap
+          key: ALLOWED_HOSTS
+    - name: DATABASE_URL
+      valueFrom:
+        configMapKeyRef:
+          name: django-configmap 
+          key: DATABASE_URL
+
+# ----------------------------------------------
 
 
-serviceAccount:
-  # Specifies whether a service account should be created
-  create: true
-  # Annotations to add to the service account
-  annotations: {}
-  # The name of the service account to use.
-  # If not set and create is true, a name is generated using the fullname template
-  name: admin-user
-  namespace: default
-
-
+#-----PERSISTENT VOLUME & PERSISTENT VOLUME CLAIM-----------
 persistentVolume:
   enabled: {}
   annotations: {}
@@ -61,7 +92,7 @@ persistentVolumeClaim:
     resources:
       requests:
         storage: 3Gi
-
+# ----------------------------------------------
 
 podAnnotations: {}
 
@@ -102,13 +133,6 @@ ingress:
   #    hosts:
   #      - chart-example.local
 
-resources: 
-  requests:
-    cpu: 100m
-    memory: 512Mi
-  limits:
-    cpu: 200m
-    memory: 1Gi
 
 autoscaling:
   enabled: true
@@ -123,6 +147,48 @@ tolerations: []
 
 affinity: {}
 
+# ---------------STORAGE CLASS-------------------
+storageClass:
+  name: efs-scs
+  provisioner: efs.csi.aws.com
+  parameters:
+    provisioningMode: efs-ap
+    fileSystemId: fs-0d1dd66c8b001d6c1
+    directoryPerms: "755"
+    basePath: "/app"
+# ----------------------------------------------
+
+# ---------------SERVICE ACCOUNTS---------------
+serviceAccount:
+  # Specifies whether a service account should be created
+  create: true
+  # Annotations to add to the service account
+  annotations: {}
+  # The name of the service account to use.
+  # If not set and create is true, a name is generated using the fullname template
+  name: admin-user
+
+#CLUSTER ROLE
+clusterRole:
+  name: read-only-user
+  rules:
+    apiGroups:
+      - core
+    resources: ["*"]
+    verbs:
+      - get
+      - list
+      - watch
+
+#CLUSTER ROLE BINDIND
+clusterRoleBinding:
+  name: read-only-binding
+  roleRef:
+    name: read-only-clusterrole
+  subjects:
+  - kind: ServiceAccount
+    name: read-only-user
+    namespace: kubernetes-dashboard
 
 
-
+# -----------------------------------------------

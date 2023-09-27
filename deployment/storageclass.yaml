@@ -1,20 +1,7 @@
 apiVersion: storage.k8s.io/v1
 kind: StorageClass
 metadata:
-  name: efs-scs
-provisioner: efs.csi.aws.com
-parameters:
-  provisioningMode: efs-ap
-  fileSystemId: fs-0d1dd66c8b001d6c1 # Change this to your EFS ID
-  directoryPerms: "755"
-  basePath: "/dynamic_provisioning"
-
-
-
-
-# cluster_name = "django-k8s-cluster"
-# db_instance_address = "django-k8s-db.cguvcrzdtxqd.eu-west-2.rds.amazonaws.com"
-# ecr_app_url = "448568155388.dkr.ecr.eu-west-2.amazonaws.com/django-k8s-app"
-# efs_csi_sa_role = "arn:aws:iam::448568155388:role/django-k8s-efs-csi20230702193524088500000002"
-# efs_id = "fs-0d1dd66c8b001d6c1"
-# region = "eu-west-2"
+  name: local-storage  
+  namespace: local
+provisioner: kubernetes.io/no-provisioner  # This indicates manual provisioning
+volumeBindingMode: WaitForFirstConsumer  # Wait for a PVC to be created before binding to a PV

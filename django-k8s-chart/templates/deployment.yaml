@@ -5,64 +5,41 @@ metadata:
   labels:
     app: django
 spec:
-  # {{- if not .Values.autoscaling.enabled }}
-  replicas: 2
-  # {{- end }}
+  replicas: {{ .Values.deployment.replicas }}
   selector:
     matchLabels:
-      app: django
-      tier: app
+      app: {{ .Values.deployment.app}}
+      tier: {{ .Values.deployment.tier}}
   strategy:
-    type: RollingUpdate
-    rollingUpdate:
-      maxSurge: 1
-      maxUnavailable: 0
+    {{- toYaml .Values.deployment.strategy | nindent 12 }}
 
   template:
     metadata:
       labels:
-        app: django
-        tier: app
+        app: {{ .Values.deployment.template.app}}
+        tier: {{ .Values.deployment.template.tier}}
     spec:
-      
       containers:
         - name: django-image
-          # securityContext:
-          #   {{- toYaml .Values.securityContext | nindent 12 }}
           image: "{{ .Values.image.repository }}:{{ .Values.image.tag}}"
-          # imagePullPolicy: {{ .Values.image.pullPolicy }}
           ports:
-            - name: djangoport
-              containerPort: 8000
+            - name: {{ .Values.deployment.containers.ports.name}}
+              containerPort: {{ .Values.deployment.containers.ports.containerPort}}
               protocol: TCP
-          livenessProbe:
-            httpGet:
-              path: /healthcheck
-              port: 8000
-          readinessProbe:
-            httpGet:
-              path: /healthcheck
-              port: 8000
+          # livenessProbe:
+          #   httpGet:
+          #     path: /healthcheck
+          #     port: 8000
+          # readinessProbe:
+          #   httpGet:
+          #     path: /healthcheck
+          #     port: 8000
           resources:
-            requests:
-              cpu: 100m
-              memory: 512Mi
-            limits:
-              cpu: 200m
-              memory: 1Gi
+            {{- toYaml .Values.deployment.containers.resources | nindent 12 }}
           env:
-          - name: ALLOWED_HOSTS
-            valueFrom:
-              configMapKeyRef:
-                name: django-configmap
-                key: ALLOWED_HOSTS
-          - name: DATABASE_URL
-            valueFrom:
-              configMapKeyRef:
-                name: django-configmap 
-                key: DATABASE_URL
-          imagePullSecrets:
-            - name : {{ .Values.imagePullSecrets.name }}
+            {{- toYaml .Values.deployment.env | nindent 12 }}
+          # imagePullSecrets:
+          #   - name : {{ .Values.imagePullSecrets.name }}
 
           volumes:
             - name: {{ .Values.volumes.name }}
