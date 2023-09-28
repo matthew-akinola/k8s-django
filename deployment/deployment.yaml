@@ -58,13 +58,11 @@ spec:
               memory: "1Gi"
               cpu: "500m"
           env:
-
             - name: ALLOWED_HOSTS
               valueFrom:
                 configMapKeyRef:
                   name: django-configmap
                   key: ALLOWED_HOSTS
-
             - name: DATABASE_URL
               valueFrom:
                 configMapKeyRef:

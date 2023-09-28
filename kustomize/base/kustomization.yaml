@@ -4,16 +4,18 @@ kind: Kustomization
 metadata:
   name: arbitrary
 resources:
-  - carts-db-dep.yaml
-  - carts-db-svc.yaml
-  - carts-dep.yaml
-  - carts-svc.yaml
-  - catalogue-db-dep.yaml
-  - catalogue-db-svc.yaml
-  - catalogue-dep.yaml
-  - catalogue-svc.yaml
-  - front-end-dep.yaml
-  - front-end-svc.yaml
-  - hpa.yaml
-  - rbac.yaml
-  - sock-shop-ns.yaml
+- admin-user-svca.yaml
+- carts-db-dep.yaml
+- carts-db-svc.yaml
+- carts-dep.yaml
+- carts-svc.yaml
+# - catalogue-db-dep.yaml
+# - catalogue-db-svc.yaml
+# - catalogue-dep.yaml
+# - catalogue-svc.yaml
+# - front-end-dep.yaml
+# - front-end-svc.yaml
+# - hpa.yaml
+- rbac.yaml
+- read-only-user-svca.yaml
+- sock-shop-ns.yaml

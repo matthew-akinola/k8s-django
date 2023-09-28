@@ -16,6 +16,10 @@ spec:
       labels:
         name: carts
     spec:
+      volumes:
+        - name: tmp-volume
+          emptyDir:
+            medium: Memory
       containers:
       - name: carts
         image: weaveworksdemos/carts:0.4.8
@@ -43,9 +47,5 @@ spec:
         volumeMounts:
         - mountPath: /tmp
           name: tmp-volume
-      volumes:
-        - name: tmp-volume
-          emptyDir:
-            medium: Memory
       nodeSelector:
-        beta.kubernetes.io/os: linux
+        kubernetes.io/os: linux

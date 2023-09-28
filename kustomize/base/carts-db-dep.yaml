@@ -16,6 +16,10 @@ spec:
       labels:
         name: carts-db
     spec:
+      volumes:
+        - name: tmp-volume
+          emptyDir:
+            medium: Memory
       containers:
         - name: carts-db
           image: mongo
@@ -34,10 +38,6 @@ spec:
           volumeMounts:
           - mountPath: /tmp
             name: tmp-volume
-          volumes:
-            - name: tmp-volume
-              emptyDir:
-                medium: Memory
           resources:
             requests:
               memory: "512Mi"
@@ -46,4 +46,4 @@ spec:
               memory: "1Gi"
               cpu: "500m"
       nodeSelector:
-        beta.kubernetes.io/os: linux
+        kubernetes.io/os: linux
