@@ -9,13 +9,13 @@ resources:
 - carts-db-svc.yaml
 - carts-dep.yaml
 - carts-svc.yaml
-# - catalogue-db-dep.yaml
-# - catalogue-db-svc.yaml
-# - catalogue-dep.yaml
-# - catalogue-svc.yaml
-# - front-end-dep.yaml
-# - front-end-svc.yaml
-# - hpa.yaml
+- catalogue-db-dep.yaml
+- catalogue-db-svc.yaml
+- catalogue-dep.yaml
+- catalogue-svc.yaml
+- front-end-dep.yaml
+- front-end-svc.yaml
+- hpa.yaml
 - rbac.yaml
 - read-only-user-svca.yaml
 - sock-shop-ns.yaml

@@ -6,25 +6,23 @@ CLUSTER_NAME="k8s-cluster"
 # Create a Kind cluster
 kind create cluster --name $CLUSTER_NAME --config cluster-config.yaml
 
+#validate if cluster is up
+kubectl cluster-info --context kind-$CLUSTER_NAME
+
 # Set the kubeconfig context to the Kind cluster
 kubectl config use-context kind-$CLUSTER_NAME
 
 #Install the manifests
 kubectl apply -k base/.
 
-# Install Metrics Server for Kubernetes API metrics
-kubectl apply -f https://github.com/kubernetes-sigs/metrics-server/releases/latest/download/components.yaml
+# # Install Metrics Server for Kubernetes API metrics
+# kubectl apply -f https://github.com/kubernetes-sigs/metrics-server/releases/latest/download/components.yaml
 
-# Wait for Metrics Server to be ready
-kubectl wait --namespace kube-system \
-  --for=condition=ready pod \
-  --selector=k8s-app=metrics-server \
-  --timeout=90s
-
-# Install Helm
-curl -fsSL -o get_helm.sh https://raw.githubusercontent.com/helm/helm/master/scripts/get-helm-3
-chmod +x get_helm.sh
-./get_helm.sh
+# # Wait for Metrics Server to be ready
+# kubectl wait --namespace kube-system \
+#   --for=condition=ready pod \
+#   --selector=k8s-app=metrics-server \
+#   --timeout=90s
 
 # Add the Prometheus Helm repository
 helm repo add prometheus-community https://prometheus-community.github.io/helm-charts
