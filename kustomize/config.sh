@@ -1,4 +1,4 @@
-#!/bin/bash
+!/bin/bash
 
 # Define the cluster name
 CLUSTER_NAME="k8s-cluster"

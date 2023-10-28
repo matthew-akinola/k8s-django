@@ -3,7 +3,7 @@ kind: Deployment
 metadata:
   name: carts
   namespace: sock-shop
-spec:
+  spec:
   template:
     spec:
       containers:

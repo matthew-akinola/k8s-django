@@ -15,8 +15,16 @@ spec:
         name: front-end
     spec:
       containers:
-      - name: front-end
-        image: weaveworksdemos/front-end:0.3.12
+      - name: do-visit-counter-frontend
+        image: techmatt/k8s-frontend:v1
+        imagePullPolicy: Always
+        env:
+          - name: COUNTER_ENDPOINT
+            value: "http://do-visit-counter-backend.default.svc.cluster.local:5000"
+        ports:
+          - name: frontend-port
+            containerPort: 8000
+            protocol: TCP
         resources:
           limits:
             cpu: 300m
@@ -24,11 +32,6 @@ spec:
           requests:
             cpu: 100m
             memory: 300Mi
-        ports:
-        - containerPort: 8079
-        env:
-        - name: SESSION_REDIS
-          value: "true"
         securityContext:
           runAsNonRoot: true
           runAsUser: 10001
@@ -50,3 +53,13 @@ spec:
           periodSeconds: 3
       nodeSelector:
         kubernetes.io/os: linux
+
+    # spec:
+    #   containers:
+    #   - name: front-end
+    #     image: weaveworksdemos/front-end:0.3.12
+        # ports:
+        # - containerPort: 8079
+        # env:
+        # - name: SESSION_REDIS
+        #   value: "true"
